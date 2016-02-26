@@ -1,0 +1,19 @@
+{
+  "name": "sonos-meets-hue",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node index.js"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "color-convert": "^1.0.0",
+    "huejay": "^1.0.3",
+    "nodemon": "^1.8.1",
+    "rx-lite": "^4.0.8",
+    "sonos": "^0.11.1"
+  }
+}
