@@ -1,9 +1,29 @@
 'use strict';
-let sonos = require('./sonos');
-let hue = require('./hue');
+const sonos = require('./sonos');
+const hue = require('./hue');
+const containsColor = require('./string-contains-color');
 
-setInterval(sonos.currentlyPlaying, 3000);
+function findColor(string){
+    let color = containsColor.hasColor(string);
+    if (color){
+	    console.log(`Color: ${color}`);
+		return color;
+	}
+    else {
+		console.log("no color found");
+    }
+};
 
-// Find color in track and convert to color for hue
 
-// hue.changeLights(color);
+sonos.currentTrack().forEach(
+		function onNext(title){
+			console.log(`Title: ${title}`)
+			let color = findColor(title);
+			if (color){
+				console.log(`Yay! Color is: ${color}`);
+				hue.changeLights(color);
+			}
+		},
+		function onError(error){
+			console.log(`Error: ${error}`);
+		});

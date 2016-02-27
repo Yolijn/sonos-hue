@@ -11,8 +11,6 @@ exports.hasColor = function(string){
 			console.log(`Found color ${word}`);
 			return(word);
 		}
-		else {
-			return false;
-		}
 	}
+	return false;
 }

@@ -14,6 +14,7 @@ let xyz = convert.keyword.xyz(color),
 
 let x = X / (X + Y + Z);
 let y = Y / (X + Y + Z);
+let xy = [x, y];
 
 // Discover hue bridges, find lights and change color
 hueJay.discover()
@@ -54,7 +55,10 @@ hueJay.discover()
 				console.log(i);
 				client.lights.getById(i)
 					.then(function(light){
+						console.log(`Light: ${light.name}`);
+						light.on = true;
 						light.xy = xy;
+						console.log(`xy ${xy}`);
 						return client.lights.save(light);
 					})
 			})
