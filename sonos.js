@@ -1,50 +1,63 @@
 'use strict';
-
-let color = require('./string-contains-color');
+const EVENTS = require ('events').EventEmitter;
+const EVENT = new EVENTS();
+const COLOR = require('./string-contains-color');
+const PLAYER = require('sonos');
+const RX = require('rx-lite');
 
 // Find sonos
-let s = require('sonos');
 let sonos = [
 	{
 		name: "upstairs",
-		player: new s.Sonos('192.168.178.27'),
-		changed: false,
-		track: "none"
+		player: new PLAYER.Sonos('192.168.178.27'),
+		track: ""
 	},
 	{
 		name: "downstairs",
-		player: new s.Sonos('192.168.178.79'),
-		changed: false,
-		track: "none"
+		player: new PLAYER.Sonos('192.168.178.79'),
+		track: ""
 	}
 ];
 
 // Find currently playing tracks
-let currentlyPlaying = function(){
+exports.currentlyPlaying = function(){
 	for(let i in sonos){
 		let zone = sonos[i];
 		zone.player.currentTrack(function(err, track){
 			if(zone.track !== track.title){
 				zone.track = track.title;
 				console.log(track.title);
-				return zone.changed = true;
+				EVENT.emit('changed', track.title);
 			}
 			else{
-				return zone.changed = false;
 				console.log(`still playing: ${track.title}`);
 			}
 		})
 	}
 };
 
-exports.findColor = function(string){
-	currentlyPlaying();
-    let hasColor = color.hasColor(string);
-    if (hasColor !== false){
-		console.log(hasColor);
+let findColor = function(string){
+    let color = COLOR.hasColor(string);
+    if (color !== false){
+		console.log(color);
 	}
 	else {
 		console.log("no color found");
 	}
-	console.log(sonos[0].track);
-}
+};
+
+let changed = RX.Observable.fromEvent(
+	EVENT,
+	'changed'
+);
+
+let subscription = 
+	changed.forEach(
+		function onNext(title){
+			findColor(title);
+		},
+		function onError(error){
+			console.log(`Error: ${error}`);
+		});
+
+
