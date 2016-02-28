@@ -18,7 +18,6 @@ let sonos = [
 		track: ""
 	}
 ];
-
 // Find currently playing tracks
 function checkCurrentlyPlaying (){
 	for (let i in sonos){
@@ -26,11 +25,7 @@ function checkCurrentlyPlaying (){
 		zone.player.currentTrack(function(err, track){
 			if (zone.track !== track.title){
 				zone.track = track.title;
-				console.log(track.title);
 				event.emit('changed', track.title);
-			}
-			else {
-				console.log(`still playing: ${track.title}`);
 			}
 		})
 	}

@@ -2,11 +2,11 @@
 const sonos = require('./sonos');
 const hue = require('./hue');
 const containsColor = require('./string-contains-color');
+let activeLights = ["Bureau", "Leeslamp", "Keuken"];
 
 function findColor(string){
     let color = containsColor.hasColor(string);
     if (color){
-	    console.log(`Color: ${color}`);
 		return color;
 	}
     else {
@@ -17,11 +17,12 @@ function findColor(string){
 
 sonos.currentTrack().forEach(
 		function onNext(title){
-			console.log(`Title: ${title}`)
-			let color = findColor(title);
-			if (color){
-				console.log(`Yay! Color is: ${color}`);
-				hue.changeLights(color);
+			if (title !== undefined){
+				console.log(`Title: ${title}`)
+				let color = findColor(title);
+				if (color){
+					hue.changeLights(color, "white", activeLights);
+				}
 			}
 		},
 		function onError(error){

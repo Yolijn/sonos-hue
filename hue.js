@@ -1,10 +1,13 @@
 'use strict';
-let hueJay = require('huejay');
-let convert = require('color-convert');
+const hueJay = require('huejay');
+const convert = require('color-convert');
 const USERNAME = "93a6cc168ba90f1bf7f2a410fae0a7";
+const eventEmitter = require ('events').EventEmitter;
+const event = new eventEmitter();
+const rx = require('rx-lite');
 
 // Discover Ip
-exports.changeLights = function(color){
+exports.changeLights = function(color, initalColor, activeLights){
 
 // Convert color to hue X/Y color input
 let xyz = convert.keyword.xyz(color),
@@ -29,39 +32,40 @@ hueJay.discover()
 			"host": firstIp,
 			"username": USERNAME
 		});
-
+ 
 		// Test connection
 		client.bridge.ping()
-		  .then(function(){
-		    // console.log('Successful connection');
-		  })
 		  .catch((error) => {
-		  	// console.log('Could not connect');
+		  	console.log('Could not connect');
 		  })
+
 
 		client.lights.getAll()
 			.then(function(lights){
-				let lightIds = [];
+				let lightsNameAndId = {};
 				for (let light of lights){
-					if (light.name !== 'Bureau')
-						continue;
-					lightIds.push(light.id);
+					for (let activeLight of activeLights){
+						if (light.name == activeLight){
+							lightsNameAndId[light.name] = light.id;
+						}
+					}
 				}
-					return lightIds;
+				return lightsNameAndId;
 			})
-
 			.then(function(lightIds){
-				let i = lightIds[0];
-				console.log(i);
-				client.lights.getById(i)
-					.then(function(light){
-						console.log(`Light: ${light.name}`);
-						light.on = true;
-						light.xy = xy;
-						console.log(`xy ${xy}`);
-						return client.lights.save(light);
-					})
+				for (let lightId in lightIds){
+					let i = lightIds[lightId];
+					
+					client.lights.getById(i)
+						.then(function(light){
+							light.on = true;
+							light.xy = xy;
+							return client.lights.save(light);
+						})
+
+				}
 			})
-		console.log(`changed the lights to ${color}`);
-	})
+		})
+			
+	console.log(`changed the lights to ${color}`);
 };
